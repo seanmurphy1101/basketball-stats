@@ -78,22 +78,32 @@ def startGame():
     playersA = []
     numbersH = []
     numbersA = []
-    dateStr =  info.get()
+    dateStr = info.get()
     infoStr = notes.get()
     for i in range(len(playersHome)):
-        playersH.append(playersHome[i].get())
-        numbersH.append(numbersHome[i].get())
+        if not ord(numbersHome[i].get()[0])==45:
+            playersH.append(playersHome[i].get())
+            numbersH.append(numbersHome[i].get())
+            #for testing purposes players are not required
+        #playersH.append(playersHome[i].get())
+        #numbersH.append(numbersHome[i].get())
     for i in range(len(playersAway)):
-        playersA.append(playersAway[i].get())
-        numbersA.append(numbersAway[i].get())
-
-    game .append(createGame(playersH, numbersH, homeTeam[0].get(), playersA, numbersA, awayTeam[0].get()))
+        if not ord(numbersAway[i].get()[0])==45:
+            playersA.append(playersAway[i].get())
+            numbersA.append(numbersAway[i].get())
+            #for testing purposes players are not required
+        #playersA.append(playersAway[i].get())
+        #numbersA.append(numbersAway[i].get())
+    if len(numbersH)<5 or len(numbersA)<5:
+        message.configure(text="5 Players Numbers Requiered for Each Team")
+        return
+    game.append(createGame(playersH, numbersH, homeTeam[0].get(), playersA, numbersA, awayTeam[0].get()))
     root.destroy()
     
 
 #create window, set theme, and initialize font
 root = ThemedTk()
-root.set_theme("smog")
+root.set_theme("aquativo")
 favorite = "keramik"
 favorite2 = "breeze"
 favorite3 = "winxpblue"
@@ -163,6 +173,8 @@ notes.pack(pady=20)
 start = ttk.Button(tab3, text="START", command=startGame)
 start.configure()
 start.pack(pady=20)
+message = ttk.Label(tab3, text="")
+message.pack()
 
 #create title page layout
 welcome = ttk.Label(tab0, text="Welcome to the Basketball Statskeeper\n"+"\nEnter team names, player names, and player numbers in the appropriate sections"+"\n \nThen, add optional date/info and click Start", justify=CENTER)
@@ -181,4 +193,4 @@ createNotebook("-away-", tab2, "Away Team", False)
 root.mainloop()
 
 
-newWindow(game[0], _font_)
+newWindow(game[0])
