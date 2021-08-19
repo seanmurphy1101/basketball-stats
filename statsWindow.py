@@ -95,9 +95,6 @@ def newWindow(game):
     # setPrev(type: String, player: String, team: String, isContested: boolean, isMissed: boolean): Void
     def setPrev(type, player, team, isContested, isMissed):
         global statsArr
-        print (" ")
-        for i in statsArr:
-            print(i.type)
         
         previousStats.append({"type": type, "player": player, "contested": isContested, "missed": isMissed })
         if type == "twos" or type == "threes":
@@ -106,6 +103,12 @@ def newWindow(game):
             bottomLabel.configure(text="PlAYER: "+player+"     TEAM: "+team+"      TYPE: FREE THROW"+("       MISSED" if isMissed else "      MADE"))
         elif type=="offensive" or type=="defensive":
             bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: "+type.upper()+" REBOUND")
+        elif type=="steals":
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: STEAL")
+        elif type=="blocks":
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: BLOCK")
+        elif type=="fouls":
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: FOUL")
         else:
             bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: "+type.upper())
 
@@ -182,10 +185,23 @@ def newWindow(game):
             reset()
     
     # foul(): Void
-    def foul(type):
-        curPlayer.fouls[type] += 1
-        curTeam.fouls[type] +=1
+    def foul():
+        curPlayer.fouls += 1
+        curTeam.fouls +=1
         setPrev("foul", curPlayer.number, curTeam.name, False, False)
+        updateStats(Stat(curPlayer, curTeam, "fouls"))
+        reset()
+
+    def block():
+        global curPlayer
+        global curTeam
+        updateStats(Stat(curPlayer, curTeam, "blocks"))
+    
+    def steal():
+        curPlayer.steals += 1
+        curTeam.steals += 1
+        setPrev("steal", curPlayer.number, curTeam.name, False, False)
+        updateStats(Stat(curPlayer, curTeam, "steals"))
         reset()
     
     # onclick(ax: Axes{}, event: Event): Void
@@ -214,8 +230,6 @@ def newWindow(game):
         ax.add_patch(innerCircle)
         canvas.draw()
 
-
-    
     # rebound(pos: String): Void
     def rebound(pos):
         if curPlayer != None and curTeam != None:
@@ -262,12 +276,34 @@ def newWindow(game):
     def saveAsCSV():
         today = date.today()
         today = today.strftime("%b-%d-%Y")
-        df = pd.DataFrame(shots)
+        dfShots = pd.DataFrame(shots)
         home_team_underscore = game.homeTeam.name.replace(" ", "_")
         away_team_underscore = game.awayTeam.name.replace(" ", "_")
+
+        homeTeamData = []
+        for i in game.playersHome:
+            homeTeamData.append(i.__dict__)
+        
+        homeTeamData.append(game.homeTeam.__dict__)
+
+        awayTeamData = []
+        for i in game.playersAway:
+            awayTeamData.append(i.__dict__)
+        
+        awayTeamData.append(game.awayTeam.__dict__)
+
         if os.path.exists('output/csv_files') == False:
             os.mkdir('output/csv_files')
-        df.to_csv(f'output/csv_files/{home_team_underscore}_vs_{away_team_underscore}{today}.csv')
+        
+        dfShots.to_csv(f'output/csv_files/{home_team_underscore}_vs_{away_team_underscore}{today}_shots.csv')
+
+        dfHomeTeam = pd.DataFrame(homeTeamData)
+        dfAwayTeam = pd.DataFrame(homeTeamData)
+
+        dfHomeTeam.to_csv(f'output/csv_files/{home_team_underscore}_stats.csv')
+        dfAwayTeam.to_csv(f'output/csv_files/{away_team_underscore}_stats.csv')
+
+
 
 
     def createBoxScore(box, team):
@@ -279,8 +315,8 @@ def newWindow(game):
             p = game.playersAway
             t= game.awayTeam
             space = ttk.Label(box, text="          ")
-            space.grid(row=0, column=5)
-            columns = 6
+            space.grid(row=0, column=8)
+            columns = 9
 
 
         playerLabelTitle = ttk.Label(box, text=t.name)
@@ -292,11 +328,20 @@ def newWindow(game):
         assistsLabelTitle = ttk.Label(box, text="ASSISTS")
         assistsLabelTitle.grid(row=0, column=columns+2, padx=5)
 
-        reboundsLabelTitel = ttk.Label(box, text="REBOUNDS")
-        reboundsLabelTitel.grid(row=0, column=columns+3, padx=5)
+        reboundsLabelTitle = ttk.Label(box, text="REBOUNDS")
+        reboundsLabelTitle.grid(row=0, column=columns+3, padx=5)
 
-        turnoversLabelTitel = ttk.Label(box, text="TURNOVERS")
-        turnoversLabelTitel.grid(row=0, column=columns+4, padx=5)
+        turnoversLabelTitle = ttk.Label(box, text="TURNOVERS")
+        turnoversLabelTitle.grid(row=0, column=columns+4, padx=5)
+
+        foulsLabelTitle = ttk.Label(box, text="FOULS")
+        foulsLabelTitle.grid(row=0, column=columns+5, padx=5)
+
+        blocksLabelTitle = ttk.Label(box, text="BLOCKS")
+        blocksLabelTitle.grid(row=0, column=columns+6, padx=5)
+
+        stealsLabelTitle = ttk.Label(box, text="STEALS")
+        stealsLabelTitle.grid(row=0, column=columns+7, padx=5)
 
         for i in range(len(p)):
             playerLabel = ttk.Label(box, text=p[i].number+"  "+p[i].name, justify=LEFT )
@@ -314,9 +359,19 @@ def newWindow(game):
             turnoversLabel = ttk.Label(box, text=str(p[i].turnovers))
             turnoversLabel.grid(row=i+1, column=columns+4, padx=5)
 
+            foulsLabel = ttk.Label(box, text=str(p[i].fouls))
+            foulsLabel.grid(row=i+1, column=columns+5, padx=5)
+
+            blocksLabel = ttk.Label(box, text=str(p[i].blocks))
+            blocksLabel.grid(row=i+1, column=columns+6, padx=5)
+
+            stealsLabel = ttk.Label(box, text=str(p[i].steals))
+            stealsLabel.grid(row=i+1, column=columns+7, padx=5)
+
+            
+
         totalLabel = ttk.Label(box, text="TOTAL")
         totalLabel.grid(column=columns+0, row=len(p)+1, padx=5)
-
 
         pointsLabelTeam = ttk.Label(box, text=str((t.shots["twos"]*2)+(t.shots["threes"]*3)+t.freethrows["made"]))
         pointsLabelTeam.grid(row=len(p)+1, column=columns+1, padx=5)
@@ -329,6 +384,16 @@ def newWindow(game):
 
         turnoversLabelTeam = ttk.Label(box, text=str(t.turnovers))
         turnoversLabelTeam.grid(row=len(p)+1, column=columns+4, padx=5)
+        
+        foulsLabelTeam = ttk.Label(box, text=str(t.fouls))
+        foulsLabelTeam.grid(row=len(p)+1, column=columns+5, padx=5)
+
+        blocksLabelTeam = ttk.Label(box, text=str(t.blocks))
+        blocksLabelTeam.grid(row=len(p)+1, column=columns+6, padx=5)
+
+        stealsLabelTeam = ttk.Label(box, text=str(t.steals))
+        stealsLabelTeam.grid(row=len(p)+1, column=columns+7, padx=5)
+
         
 
     # isContested(): Void
@@ -426,6 +491,15 @@ def newWindow(game):
             else: 
                 instance.player.shots["uncontested"] -= 1
                 instance.team.shots["uncontested"] -= 1
+        elif instance.type == "steals":
+            instance.player.steals -= 1
+            instance.team.steals -= 1
+        elif instance.type == "fouls":
+            instance.player.fouls -= 1
+            instance.team.fouls -= 1
+        elif instance.type == "blocks":
+            instance.player.blocks -= 1
+            instance.team.blocks -= 1
         del statsArr[-1]
         if len(statsArr) == 0:
             bottomLabel.configure(text="")
@@ -434,8 +508,6 @@ def newWindow(game):
         else:
             setPrev(statsArr[-1].type, statsArr[-1].player.name, statsArr[-1].team.name, statsArr[-1].contested, statsArr[-1].missed)
     
-
-   
     # createSub(): Void
     def createSub():
         # apply(home: boolean): Void
@@ -599,20 +671,23 @@ def newWindow(game):
         #screenButtonsAway[i].configure(anchor='center')
 
     # all stats related buttons
+    px = 3
+    py = 3
+
     stats = ttk.Frame(mainFrame)
-    stats.grid(row=1, column=1, padx=5, pady=5)
+    stats.grid(row=1, column=1, padx=px, pady=5)
 
     assistsButton = ttk.Button(stats, text="ASSIST", command=assist)
-    assistsButton.grid(row=0,column=0, padx=7, pady=5)
+    assistsButton.grid(row=0,column=0, padx=px, pady=5)
 
     offRebound = ttk.Button(stats, text="OFFENSIVE REBOUND", command = lambda: rebound("offensive"))
-    offRebound.grid(row=0, column=1, padx=7, pady=5)
+    offRebound.grid(row=0, column=1, padx=px, pady=5)
 
     defRebound = ttk.Button(stats, text="DEFENSIVE REBOUND", command = lambda: rebound("defensive"))
-    defRebound.grid(row=0, column=2, padx=7, pady=5)
+    defRebound.grid(row=0, column=2, padx=px, pady=5)
 
     isMissFrame = ttk.Frame(stats)
-    isMissFrame.grid(row=0, column=8, padx=7, pady=5)
+    isMissFrame.grid(row=0, column=11, padx=px, pady=5)
     isMissFrame['relief'] = 'flat'
     isMissFrame['borderwidth'] = '5'
     isMissButton = ttk.Button(isMissFrame, text="MISS", command = isMiss)
@@ -620,23 +695,33 @@ def newWindow(game):
 
     divider = ttk.Label(stats, text="|")
     divider.configure(font=font.Font(family="Menlo", size=24, weight="bold"))
-    divider.grid(row=0, column=7, pady=0)
+    divider.grid(row=0, column=10, pady=0)
 
     addShot2 = ttk.Button(stats, text="2", command=lambda: addShot2or3("twos"))
-    addShot2.grid(row=0, column=4, padx=7, pady=5)
+    addShot2.grid(row=0, column=4, padx=px, pady=5)
 
     addShot3 = ttk.Button(stats, text="3", command=lambda: addShot2or3("threes"))
-    addShot3.grid(row=0, column=5, padx=7, pady=5)
+    addShot3.grid(row=0, column=5, padx=px, pady=5)
 
     turnoverButton = ttk.Button(stats, text="TURNOVER", command = turnover)
-    turnoverButton.grid(row=0, column=6, padx=7, pady=5)
+    turnoverButton.grid(row=0, column=6, padx=px, pady=5)
 
     freeThrowButton = ttk.Button(stats, text="FREE THROW", command = freeThrow)
-    freeThrowButton.grid(row=0, column=3, padx=7, pady=5)
+    freeThrowButton.grid(row=0, column=3, padx=px, pady=5)
+
+    foulButton = ttk.Button(stats, text="FOUL", command=foul)
+    foulButton.grid(row=0, column=7, padx=px, pady=5)
+
+    stealButton = ttk.Button(stats, text="STEAL", command=steal)
+    stealButton.grid(row=0, column=8, padx=px, pady=5)
+
+    blockButton = ttk.Button(stats, text="BLOCK", command=block)
+    blockButton.grid(row=0, column=9, padx=px, pady=5)
+    
 
 
     contestedFrame = ttk.Frame(stats)
-    contestedFrame.grid(row=0, column=9, padx=7, pady=5)
+    contestedFrame.grid(row=0, column=12, padx=7, pady=5)
     contestedFrame['relief'] = 'flat'
     contestedFrame['borderwidth'] = '5'
     contestedButton = ttk.Button(contestedFrame, text="CONTESTED", command = isContested)
@@ -681,16 +766,6 @@ def newWindow(game):
 
     '''
     to do:
-
-    toggle 2, 3 , freethrow
-
-    add freethrow location
-
-    add foul button
-
-    add steals
-
-    add blocks
 
     add players and teams to saveAsCSV
 

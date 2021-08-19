@@ -8,7 +8,9 @@ class Player():
         self.rebounds = {"offensive": 0, "defensive": 0}
         self.turnovers = 0
         self.freethrows = {"made": 0, "missed": 0}
-        self.fouls = {"normal": 0,"flagrant": 0, "technical": 0}
+        self.fouls = 0
+        self.steals = 0
+        self.blocks = 0
         
 class Team():
     def __init__(self, name):
@@ -18,7 +20,9 @@ class Team():
         self.rebounds = {"offensive": 0, "defensive": 0}
         self.turnovers = 0
         self.freethrows = {"made": 0, "missed": 0}
-        self.fouls = {"normal": 0, "flagrant": 0, "technical": 0}
+        self.fouls = 0
+        self.steals = 0
+        self.blocks = 0
         
 
 class Shot():
