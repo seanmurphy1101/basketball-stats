@@ -1,5 +1,4 @@
 from os import remove
-import tkinter
 from stats import Player, Shot, Team
 from tkinter import *
 from tkinter import Frame, Label, ttk, font
@@ -764,13 +763,6 @@ def newWindow(game):
     # run loop
     master.mainloop()
 
-    '''
-    to do:
-
-    add players and teams to saveAsCSV
-
-    add fouls, steals, and blocks to box score
-    '''
 
     
 
