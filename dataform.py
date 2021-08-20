@@ -97,7 +97,7 @@ def startGame():
     if len(numbersH)<5 or len(numbersA)<5:
         message.configure(text="5 Players Numbers Requiered for Each Team")
         return
-    game.append(createGame(playersH, numbersH, homeTeam[0].get(), playersA, numbersA, awayTeam[0].get()))
+    game = createGame(playersH, numbersH, homeTeam[0].get(), playersA, numbersA, awayTeam[0].get())
     root.destroy()
     
 
@@ -192,5 +192,15 @@ createNotebook("-away-", tab2, "Away Team", False)
 #run the window
 root.mainloop()
 
+exampleHomePlayers = ['Russell Westbrook', 'Anthony Davis', 'Lebron James', 'Dwight Howard', 'Carmelo Anthony', 'Jared Dudley', 'Wesley Matthews', 'Malik Monk', 'Marc Gasol', 'Wayne Ellington', 'Trevor Ariza', 'Kent Bazemore', 'Kendrick Nunn', 'Kostas Antetokounpo', 'Devontae Cacok']
+exampleHomeNumbers = ['4', '3', '6', '39', '00', '10', '9', '1', '14', '8', '11', '26', '25', '37', '12']
 
-newWindow(game[0])
+exampleAwayPlayers = ['Jayson Tatum', 'Marcus Smart', 'Jaylen Brown', 'Enes Kanter', 'Jabari Parker', 'Kris Dunn', 'Tacko Fall', 'Luke Kornet', 'Romeo Langford', 'Payton Pritchard', 'Josh Richardson', 'Dennis Schroder', 'Grant Williams', 'Carson Edwards', 'Robert Williams III']
+exampleAwayNumbers = ['0', '36', '7', '11', '20', '32', '99', '40', '45', '11', '0', '17', '12', '4', '44']
+exampleGame = createGame(exampleHomePlayers, exampleHomeNumbers, 'LA Lakers', exampleAwayPlayers, exampleAwayNumbers, 'Boston Celtics')
+
+
+# comment out unless example
+game = exampleGame
+
+newWindow(game)

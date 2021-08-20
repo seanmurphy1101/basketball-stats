@@ -7,10 +7,8 @@ from ttkthemes import THEMES, ThemedTk
 from sub import SubWindow, Miss, Contested
 from functools import partial
 from court import drawCourt
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.patches import Circle, Rectangle, Arc
+from matplotlib.patches import Circle, Arc
 from statInstance import Stat
 import pandas as pd
 import os
@@ -56,6 +54,8 @@ def newWindow(game):
     statsArr = []
     screenFramesHome = []
     screenFramesAway = []
+
+
 
     # displaySubs(): Void
     def displaySubs():
@@ -244,8 +244,9 @@ def newWindow(game):
             addShot(points)
             setPrev(points, curPlayer.number, curTeam.name, contested.contested, missed.missed)
             instance = Stat(curPlayer, curTeam, points)
-            curPlayer.shots[points] += 1
-            curTeam.shots[points] += 1
+            if not missed:
+                curPlayer.shots[points] += 1
+                curTeam.shots[points] += 1
             if missed:
                 curPlayer.shots["missed"][points] +=1
                 curTeam.shots["missed"][points] +=1
