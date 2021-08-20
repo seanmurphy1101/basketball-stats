@@ -296,7 +296,7 @@ def newWindow(game):
         dfShots.to_csv(f'output/csv_files/{home_team_underscore}_vs_{away_team_underscore}{today}_shots.csv')
 
         dfHomeTeam = pd.DataFrame(homeTeamData)
-        dfAwayTeam = pd.DataFrame(homeTeamData)
+        dfAwayTeam = pd.DataFrame(awayTeamData)
 
         dfHomeTeam.to_csv(f'output/csv_files/{home_team_underscore}_stats.csv')
         dfAwayTeam.to_csv(f'output/csv_files/{away_team_underscore}_stats.csv')
