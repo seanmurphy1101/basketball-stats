@@ -97,7 +97,7 @@ def startGame():
     if len(numbersH)<5 or len(numbersA)<5:
         message.configure(text="5 Players Numbers Requiered for Each Team")
         return
-    game = createGame(playersH, numbersH, homeTeam[0].get(), playersA, numbersA, awayTeam[0].get())
+    game.append(createGame(playersH, numbersH, homeTeam[0].get(), playersA, numbersA, awayTeam[0].get()))
     root.destroy()
     
 
@@ -201,6 +201,6 @@ exampleGame = createGame(exampleHomePlayers, exampleHomeNumbers, 'LA Lakers', ex
 
 
 # comment out unless example
-game = exampleGame
+#game[0] = exampleGame
 
-newWindow(game)
+newWindow(game[0])
