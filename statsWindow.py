@@ -1,5 +1,4 @@
-from os import remove
-from stats import Player, Shot, Team
+from stats import Shot
 from tkinter import *
 from tkinter import Frame, Label, ttk, font
 from tkinter.constants import CENTER
@@ -8,11 +7,12 @@ from sub import SubWindow, Miss, Contested
 from functools import partial
 from court import drawCourt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.patches import Circle, Arc
+from matplotlib.patches import Circle
 from statInstance import Stat
 import pandas as pd
 import os
 from datetime import date
+
 
 # newWindow(game: Game{}): Void
 def newWindow(game):
@@ -54,8 +54,6 @@ def newWindow(game):
     statsArr = []
     screenFramesHome = []
     screenFramesAway = []
-
-
 
     # displaySubs(): Void
     def displaySubs():
