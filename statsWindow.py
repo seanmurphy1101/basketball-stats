@@ -188,7 +188,11 @@ def newWindow(game):
     def block():
         global curPlayer
         global curTeam
+        curPlayer.blocks += 1
+        curTeam.blocks += 1
+        setPrev("blocks", curPlayer.number, curTeam.name, False, False)
         updateStats(Stat(curPlayer, curTeam, "blocks"))
+        reset()
     
     def steal():
         curPlayer.steals += 1
@@ -282,18 +286,18 @@ def newWindow(game):
         
         awayTeamData.append(game.awayTeam.__dict__)
 
-        if os.path.exists('output/csv_files') == False:
-            os.mkdir('output/csv_files')
+        file_path = (f"output/{home_team_underscore}_vs_{away_team_underscore}{today}/")
+        check_folder = os.path.isdir(file_path)
+        if not check_folder:
+            os.makedirs(file_path)
         
-        dfShots.to_csv(f'output/csv_files/{home_team_underscore}_vs_{away_team_underscore}{today}_shots.csv')
+        dfShots.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{home_team_underscore}_vs_{away_team_underscore}{today}_shots.csv')
 
         dfHomeTeam = pd.DataFrame(homeTeamData)
         dfAwayTeam = pd.DataFrame(homeTeamData)
 
-        dfHomeTeam.to_csv(f'output/csv_files/{home_team_underscore}_stats.csv')
-        dfAwayTeam.to_csv(f'output/csv_files/{away_team_underscore}_stats.csv')
-
-
+        dfHomeTeam.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{home_team_underscore}_stats.csv')
+        dfAwayTeam.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{away_team_underscore}_stats.csv')
 
 
     def createBoxScore(box, team):
