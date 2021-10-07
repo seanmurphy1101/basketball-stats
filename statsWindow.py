@@ -238,10 +238,10 @@ def newWindow(game):
             addShot(points)
             setPrev(points, curPlayer.number, curTeam.name, contested.contested, missed.missed)
             instance = Stat(curPlayer, curTeam, points)
-            if not missed:
+            if not missed.missed:
                 curPlayer.shots[points] += 1
                 curTeam.shots[points] += 1
-            if missed:
+            if missed.missed:
                 curPlayer.shots["missed"][points] +=1
                 curTeam.shots["missed"][points] +=1
                 instance.setMissed()
@@ -273,7 +273,7 @@ def newWindow(game):
         dfShots = pd.DataFrame(shots)
         home_team_underscore = game.homeTeam.name.replace(" ", "_")
         away_team_underscore = game.awayTeam.name.replace(" ", "_")
-
+        
         homeTeamData = []
         for i in game.playersHome:
             homeTeamData.append(i.__dict__)
@@ -294,7 +294,7 @@ def newWindow(game):
         dfShots.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{home_team_underscore}_vs_{away_team_underscore}{today}_shots.csv')
 
         dfHomeTeam = pd.DataFrame(homeTeamData)
-        dfAwayTeam = pd.DataFrame(homeTeamData)
+        dfAwayTeam = pd.DataFrame(awayTeamData)
 
         dfHomeTeam.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{home_team_underscore}_stats.csv')
         dfAwayTeam.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{away_team_underscore}_stats.csv')

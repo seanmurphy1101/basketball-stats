@@ -201,6 +201,6 @@ exampleGame = createGame(exampleHomePlayers, exampleHomeNumbers, 'LA Lakers', ex
 
 
 # comment out unless example
-#game[0] = exampleGame
+game[0] = exampleGame
 
 newWindow(game[0])
