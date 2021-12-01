@@ -21,7 +21,6 @@ def newWindow(game):
     master = ThemedTk()
     master.title("statskeeper")
     master.set_theme("aquativo")
-    master.geometry('1280x720')
     Menlo = font.Font(family="Menlo", size=14, weight="bold")
     master.option_add("*Font", Menlo)
     mainFrame = ttk.Frame(master)
