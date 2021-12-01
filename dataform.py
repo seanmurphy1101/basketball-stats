@@ -103,6 +103,7 @@ def startGame():
 
 #create window, set theme, and initialize font
 root = ThemedTk()
+root.geometry("1280x720")
 root.set_theme("aquativo")
 favorite = "keramik"
 favorite2 = "breeze"
@@ -201,6 +202,6 @@ exampleGame = createGame(exampleHomePlayers, exampleHomeNumbers, 'LA Lakers', ex
 
 
 # comment out unless example
-game[0] = exampleGame
+# game[0] = exampleGame
 
 newWindow(game[0])
