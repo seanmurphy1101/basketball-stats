@@ -19,6 +19,7 @@ from datetime import date
 # newWindow(game: Game{}): Void
 def newWindow(game):
     master = ThemedTk()
+    master.geometry("")
     master.title("statskeeper")
     master.set_theme("aquativo")
     Menlo = font.Font(family="Menlo", size=14, weight="bold")
@@ -532,79 +533,79 @@ def newWindow(game):
 
 
         playerLabelTitle = ttk.Label(box, text=t.name)
-        playerLabelTitle.grid(column=columns+0, row=0, padx=5)
+        playerLabelTitle.grid(column=columns+0, row=0, padx=2)
 
         pointsLabelTitle = ttk.Label(box, text="POINTS")
-        pointsLabelTitle.grid(row=0, column=columns+1, padx=5)
+        pointsLabelTitle.grid(row=0, column=columns+1, padx=2)
 
         assistsLabelTitle = ttk.Label(box, text="ASSISTS")
-        assistsLabelTitle.grid(row=0, column=columns+2, padx=5)
+        assistsLabelTitle.grid(row=0, column=columns+2, padx=2)
 
         reboundsLabelTitle = ttk.Label(box, text="REBOUNDS")
-        reboundsLabelTitle.grid(row=0, column=columns+3, padx=5)
+        reboundsLabelTitle.grid(row=0, column=columns+3, padx=2)
 
         turnoversLabelTitle = ttk.Label(box, text="TURNOVERS")
-        turnoversLabelTitle.grid(row=0, column=columns+4, padx=5)
+        turnoversLabelTitle.grid(row=0, column=columns+4, padx=2)
 
         foulsLabelTitle = ttk.Label(box, text="FOULS")
-        foulsLabelTitle.grid(row=0, column=columns+5, padx=5)
+        foulsLabelTitle.grid(row=0, column=columns+5, padx=2)
 
         blocksLabelTitle = ttk.Label(box, text="BLOCKS")
-        blocksLabelTitle.grid(row=0, column=columns+6, padx=5)
+        blocksLabelTitle.grid(row=0, column=columns+6, padx=2)
 
         stealsLabelTitle = ttk.Label(box, text="STEALS")
-        stealsLabelTitle.grid(row=0, column=columns+7, padx=5)
+        stealsLabelTitle.grid(row=0, column=columns+7, padx=2)
 
         for i in range(len(p)):
             playerLabel = ttk.Label(box, text=p[i].number+"  "+p[i].name, justify=LEFT )
-            playerLabel.grid(row=i+1, column=columns+0, padx=5)
+            playerLabel.grid(row=i+1, column=columns+0, padx=2)
 
             pointsLabel = ttk.Label(box, text=str((p[i].shots["twos"]*2)+(p[i].shots["threes"]*3)+p[i].freethrows["made"]))
-            pointsLabel.grid(row=i+1, column=columns+1, padx=5)
+            pointsLabel.grid(row=i+1, column=columns+1, padx=2)
 
             assistsLabel = ttk.Label(box, text=str(p[i].assists))
-            assistsLabel.grid(row=i+1, column=columns+2, padx=5)
+            assistsLabel.grid(row=i+1, column=columns+2, padx=2)
 
             reboundsLabel = ttk.Label(box, text=str(p[i].rebounds["offensive"]+p[i].rebounds["defensive"]))
-            reboundsLabel.grid(row=i+1, column=columns+3, padx=5)
+            reboundsLabel.grid(row=i+1, column=columns+3, padx=2)
 
             turnoversLabel = ttk.Label(box, text=str(p[i].turnovers))
-            turnoversLabel.grid(row=i+1, column=columns+4, padx=5)
+            turnoversLabel.grid(row=i+1, column=columns+4, padx=2)
 
             foulsLabel = ttk.Label(box, text=str(p[i].fouls))
-            foulsLabel.grid(row=i+1, column=columns+5, padx=5)
+            foulsLabel.grid(row=i+1, column=columns+5, padx=2)
 
             blocksLabel = ttk.Label(box, text=str(p[i].blocks))
-            blocksLabel.grid(row=i+1, column=columns+6, padx=5)
+            blocksLabel.grid(row=i+1, column=columns+6, padx=2)
 
             stealsLabel = ttk.Label(box, text=str(p[i].steals))
-            stealsLabel.grid(row=i+1, column=columns+7, padx=5)
+            stealsLabel.grid(row=i+1, column=columns+7, padx=2)
 
             
 
         totalLabel = ttk.Label(box, text="TOTAL")
-        totalLabel.grid(column=columns+0, row=len(p)+1, padx=5)
+        totalLabel.grid(column=columns+0, row=len(p)+1, padx=2)
 
         pointsLabelTeam = ttk.Label(box, text=str((t.shots["twos"]*2)+(t.shots["threes"]*3)+t.freethrows["made"]))
-        pointsLabelTeam.grid(row=len(p)+1, column=columns+1, padx=5)
+        pointsLabelTeam.grid(row=len(p)+1, column=columns+1, padx=2)
 
         assistsLabelTeam = ttk.Label(box, text=str(t.assists))
-        assistsLabelTeam.grid(row=len(p)+1, column=columns+2, padx=5)
+        assistsLabelTeam.grid(row=len(p)+1, column=columns+2, padx=2)
 
         reboundsLabelTeam = ttk.Label(box, text=str(t.rebounds["offensive"]+t.rebounds["defensive"]))
-        reboundsLabelTeam.grid(row=len(p)+1, column=columns+3, padx=5)
+        reboundsLabelTeam.grid(row=len(p)+1, column=columns+3, padx=2)
 
         turnoversLabelTeam = ttk.Label(box, text=str(t.turnovers))
-        turnoversLabelTeam.grid(row=len(p)+1, column=columns+4, padx=5)
+        turnoversLabelTeam.grid(row=len(p)+1, column=columns+4, padx=2)
         
         foulsLabelTeam = ttk.Label(box, text=str(t.fouls))
-        foulsLabelTeam.grid(row=len(p)+1, column=columns+5, padx=5)
+        foulsLabelTeam.grid(row=len(p)+1, column=columns+5, padx=2)
 
         blocksLabelTeam = ttk.Label(box, text=str(t.blocks))
-        blocksLabelTeam.grid(row=len(p)+1, column=columns+6, padx=5)
+        blocksLabelTeam.grid(row=len(p)+1, column=columns+6, padx=2)
 
         stealsLabelTeam = ttk.Label(box, text=str(t.steals))
-        stealsLabelTeam.grid(row=len(p)+1, column=columns+7, padx=5)
+        stealsLabelTeam.grid(row=len(p)+1, column=columns+7, padx=2)
 
         
 
@@ -766,10 +767,10 @@ def newWindow(game):
     
     # create home and away sub labels
     homeSubLabel = ttk.Label(mainFrame, text="Home Subs", width=10, justify=RIGHT)
-    homeSubLabel.grid(row=1, column=0, padx=77, sticky='w')
+    homeSubLabel.grid(row=1, column=0, padx=20, sticky='w')
 
     awaySubLabel = ttk.Label(mainFrame, text="Away Subs", width=10, justify=LEFT)
-    awaySubLabel.grid(row=1, column=2, padx=77)
+    awaySubLabel.grid(row=1, column=2, padx=20)
 
     # create frame for all onscreen player buttons
     buttonFrame = ttk.Frame(mainFrame)
@@ -804,7 +805,7 @@ def newWindow(game):
     homeFrame1.grid(row=0, column=1)
     screenFramesHome.append(homeFrame1)
     homeButton1 = ttk.Button(homeFrame1, text=game.playersHome[0].number, command=lambda: setCurrent(game.playersHome[0], homeFrame1, True), width=screenButtonsWidth ) 
-    homeButton1.pack(pady=3, padx=3)
+    homeButton1.pack(pady=1, padx=1)
     screenButtonsHome.append(homeButton1)
 
     homeFrame2 = ttk.Frame(home)
@@ -812,7 +813,7 @@ def newWindow(game):
     homeFrame2.grid(row=0, column=2)
     screenFramesHome.append(homeFrame2)
     homeButton2 = ttk.Button(homeFrame2, text=game.playersHome[1].number, command=lambda: setCurrent(game.playersHome[1], homeFrame2, True), width=screenButtonsWidth)
-    homeButton2.pack(pady=3, padx=3)
+    homeButton2.pack(pady=1, padx=1)
     screenButtonsHome.append(homeButton2)
 
     homeFrame3 = ttk.Frame(home)
@@ -820,7 +821,7 @@ def newWindow(game):
     homeFrame3.grid(row=0, column=3)
     screenFramesHome.append(homeFrame3)
     homeButton3 = ttk.Button(homeFrame3, text=game.playersHome[2].number, command=lambda: setCurrent(game.playersHome[2], homeFrame3, True), width=screenButtonsWidth)
-    homeButton3.pack(pady=3, padx=3)
+    homeButton3.pack(pady=1, padx=1)
     screenButtonsHome.append(homeButton3)
 
     homeFrame4 = ttk.Frame(home)
@@ -828,7 +829,7 @@ def newWindow(game):
     homeFrame4.grid(row=0, column=4)
     screenFramesHome.append(homeFrame4)
     homeButton4 = ttk.Button(homeFrame4, text=game.playersHome[3].number, command=lambda: setCurrent(game.playersHome[3], homeFrame4, True), width=screenButtonsWidth)
-    homeButton4.pack(pady=3, padx=3)
+    homeButton4.pack(pady=1, padx=1)
     screenButtonsHome.append(homeButton4)
 
     homeFrame5 = ttk.Frame(home)
@@ -836,7 +837,7 @@ def newWindow(game):
     homeFrame5.grid(row=0, column=5)
     screenFramesHome.append(homeFrame5)
     homeButton5 = ttk.Button(homeFrame5, text=game.playersHome[4].number, command=lambda: setCurrent(game.playersHome[4], homeFrame5, True), width=screenButtonsWidth)
-    homeButton5.pack(pady=3, padx=3)
+    homeButton5.pack(pady=1, padx=1)
     screenButtonsHome.append(homeButton5)
 
     # create five onscreen player buttons and then sub button
@@ -849,7 +850,7 @@ def newWindow(game):
     awayFrame1.grid(row=0, column=0)
     screenFramesAway.append(awayFrame1)
     awayButton1 = ttk.Button(awayFrame1, text=game.playersAway[0].number, command=lambda: setCurrent(game.playersAway[0], awayFrame1, False), width=screenButtonsWidth)
-    awayButton1.pack(pady=3,padx=3)
+    awayButton1.pack(pady=1,padx=1)
     screenButtonsAway.append(awayButton1)
 
     awayFrame2 = ttk.Frame(away)
@@ -857,7 +858,7 @@ def newWindow(game):
     awayFrame2.grid(row=0, column=1)
     screenFramesAway.append(awayFrame2)
     awayButton2 = ttk.Button(awayFrame2, text=game.playersAway[1].number, command=lambda: setCurrent(game.playersAway[1], awayFrame2, False), width=screenButtonsWidth)
-    awayButton2.pack(pady=3,padx=3)
+    awayButton2.pack(pady=1,padx=1)
     screenButtonsAway.append(awayButton2)
 
     awayFrame3 = ttk.Frame(away)
@@ -865,7 +866,7 @@ def newWindow(game):
     awayFrame3.grid(row=0, column=2)
     screenFramesAway.append(awayFrame3)
     awayButton3 = ttk.Button(awayFrame3, text=game.playersAway[2].number, command=lambda: setCurrent(game.playersAway[2], awayFrame3, False), width=screenButtonsWidth)
-    awayButton3.pack(pady=3,padx=3)
+    awayButton3.pack(pady=1,padx=1)
     screenButtonsAway.append(awayButton3)
 
     awayFrame4 = ttk.Frame(away)
@@ -873,7 +874,7 @@ def newWindow(game):
     awayFrame4.grid(row=0, column=3)
     screenFramesAway.append(awayFrame4)
     awayButton4 = ttk.Button(awayFrame4, text=game.playersAway[3].number, command=lambda: setCurrent(game.playersAway[3], awayFrame4, False), width=screenButtonsWidth)
-    awayButton4.pack(pady=3,padx=3)
+    awayButton4.pack(pady=1,padx=1)
     screenButtonsAway.append(awayButton4)
 
     awayFrame5 = ttk.Frame(away)
@@ -881,7 +882,7 @@ def newWindow(game):
     awayFrame5.grid(row=0, column=4)
     screenFramesAway.append(awayFrame5)
     awayButton5 = ttk.Button(awayFrame5, text=game.playersAway[4].number, command=lambda: setCurrent(game.playersAway[4], awayFrame5, False), width=screenButtonsWidth)
-    awayButton5.pack(pady=3,padx=3)
+    awayButton5.pack(pady=1,padx=1)
     screenButtonsAway.append(awayButton5)
 
 
@@ -892,23 +893,23 @@ def newWindow(game):
         #screenButtonsAway[i].configure(anchor='center')
 
     # all stats related buttons
-    px = 3
-    py = 3
+    px = 1
+    py = 1
 
     stats = ttk.Frame(mainFrame)
-    stats.grid(row=1, column=1, padx=px, pady=5)
+    stats.grid(row=1, column=1, padx=px, pady=2)
 
     assistsButton = ttk.Button(stats, text="ASSIST", command=assist)
-    assistsButton.grid(row=0,column=0, padx=px, pady=5)
+    assistsButton.grid(row=0,column=0, padx=px, pady=2)
 
     offRebound = ttk.Button(stats, text="OFFENSIVE REBOUND", command = lambda: rebound("offensive"))
-    offRebound.grid(row=0, column=1, padx=px, pady=5)
+    offRebound.grid(row=0, column=1, padx=px, pady=2)
 
     defRebound = ttk.Button(stats, text="DEFENSIVE REBOUND", command = lambda: rebound("defensive"))
-    defRebound.grid(row=0, column=2, padx=px, pady=5)
+    defRebound.grid(row=0, column=2, padx=px, pady=2)
 
     isMissFrame = ttk.Frame(stats)
-    isMissFrame.grid(row=0, column=11, padx=px, pady=5)
+    isMissFrame.grid(row=0, column=11, padx=px, pady=2)
     isMissFrame['relief'] = 'flat'
     isMissFrame['borderwidth'] = '5'
     isMissButton = ttk.Button(isMissFrame, text="MISS", command = isMiss)
@@ -919,30 +920,30 @@ def newWindow(game):
     divider.grid(row=0, column=10, pady=0)
 
     addShot2 = ttk.Button(stats, text="2", command=lambda: addShot2or3("twos"))
-    addShot2.grid(row=0, column=4, padx=px, pady=5)
+    addShot2.grid(row=0, column=4, padx=px, pady=2)
 
     addShot3 = ttk.Button(stats, text="3", command=lambda: addShot2or3("threes"))
-    addShot3.grid(row=0, column=5, padx=px, pady=5)
+    addShot3.grid(row=0, column=5, padx=px, pady=2)
 
     turnoverButton = ttk.Button(stats, text="TURNOVER", command = turnover)
-    turnoverButton.grid(row=0, column=6, padx=px, pady=5)
+    turnoverButton.grid(row=0, column=6, padx=px, pady=2)
 
     freeThrowButton = ttk.Button(stats, text="FREE THROW", command = freeThrow)
-    freeThrowButton.grid(row=0, column=3, padx=px, pady=5)
+    freeThrowButton.grid(row=0, column=3, padx=px, pady=2)
 
     foulButton = ttk.Button(stats, text="FOUL", command=foul)
-    foulButton.grid(row=0, column=7, padx=px, pady=5)
+    foulButton.grid(row=0, column=7, padx=px, pady=2)
 
     stealButton = ttk.Button(stats, text="STEAL", command=steal)
-    stealButton.grid(row=0, column=8, padx=px, pady=5)
+    stealButton.grid(row=0, column=8, padx=px, pady=2)
 
     blockButton = ttk.Button(stats, text="BLOCK", command=block)
-    blockButton.grid(row=0, column=9, padx=px, pady=5)
+    blockButton.grid(row=0, column=9, padx=px, pady=2)
     
 
 
     contestedFrame = ttk.Frame(stats)
-    contestedFrame.grid(row=0, column=12, padx=7, pady=5)
+    contestedFrame.grid(row=0, column=12, padx=3, pady=2)
     contestedFrame['relief'] = 'flat'
     contestedFrame['borderwidth'] = '5'
     contestedButton = ttk.Button(contestedFrame, text="CONTESTED", command = isContested)
@@ -959,9 +960,9 @@ def newWindow(game):
 
 
     bottomTitle = ttk.Label(mainFrame, text="LAST ADDED STAT: ")
-    bottomTitle.grid(row=3, column=1, pady=6)
+    bottomTitle.grid(row=3, column=1, pady=3)
     bottomLabel = ttk.Label(mainFrame, text="")
-    bottomLabel.grid(row=4, column=1, pady=20)
+    bottomLabel.grid(row=4, column=1, pady=10)
 
     style_1 = {'bg': 'RoyalBlue3', 'activebackground':
     'gray71', 'activeforeground': 'gray71'}

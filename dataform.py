@@ -103,6 +103,7 @@ def startGame():
 
 #create window, set theme, and initialize font
 root = ThemedTk()
+root.geometry("")
 root.set_theme("aquativo")
 favorite = "keramik"
 favorite2 = "breeze"

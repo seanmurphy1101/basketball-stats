@@ -12,12 +12,12 @@ def drawCourt():
     color="black"
     lw=1
     zorder=1
-    # fig = plt.figure(figsize=(9.4,6.0))
+#     fig = plt.figure(figsize=(9.4,6.0))
     #fig = Figure([9.4, 6.0])
     fig, ax = plt.subplots()
     im = ax.imshow(img, extent=[-50,50,-30,30])
-    fig.set_figheight(6)
-    fig.set_figwidth(9.4)
+    fig.set_figheight(5)
+    fig.set_figwidth(8.4)
     # ax = plt.gca()
     # axmax  = fig.add_axes([0.25, 0.01, 0.65, 0.03])
         
