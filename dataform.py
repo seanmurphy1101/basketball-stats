@@ -63,8 +63,12 @@ def createNotebook(name, tab, label, h):
 
     frame = ttk.Frame(tab)
     frame.pack(pady=40)
+    
+    frame.grid_columnconfigure(0, weight=1)
+    frame.grid_columnconfigure(1, weight=1)
 
     for i in range(15):
+        frame.grid_rowconfigure(i, weight=1)
         if h:
             createEntry(frame, str(i+1), 60, True, True).grid(row=i, column=0,padx=0, pady=1)
             createEntry(frame, "--", 10, False, True).grid(row=i, column=1, padx=0, pady=1)
