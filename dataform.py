@@ -103,7 +103,7 @@ def startGame():
 
 #create window, set theme, and initialize font
 root = ThemedTk()
-root.geometry("")
+root.geometry("1280x650")
 root.set_theme("aquativo")
 favorite = "keramik"
 favorite2 = "breeze"
@@ -157,17 +157,6 @@ main.add(tab1, text="Home")
 main.add(tab2, text="Away")
 main.add(tab3, text="Info and Start")
 
-# Create Canvas
-canvas1 = Canvas(tab1)
-canvas2 = Canvas(tab2)
-scroll1 = ttk.Scrollbar(tab1, command=canvas1.yview)
-scroll2 = ttk.Scrollbar(tab2, command=canvas2.yview)
-canvas1.config(yscrollcommand=scroll1.set, scrollregion=(0, 0, 100, 1000))
-canvas2.config(yscrollcommand=scroll2.set, scrollregion=(0, 0, 100, 1000))
-canvas1.pack(side=LEFT, fill=BOTH, expand=True)
-canvas2.pack(side=LEFT, fill=BOTH, expand=True)
-scroll1.pack(side=RIGHT, fill=Y)
-scroll2.pack(side=RIGHT, fill=Y)
 
 #add a label to the info tab for the date
 date = ttk.Label(tab3, text="Date")
