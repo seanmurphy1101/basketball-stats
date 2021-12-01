@@ -66,11 +66,11 @@ def createNotebook(name, tab, label, h):
 
     for i in range(15):
         if h:
-            createEntry(frame, str(i+1), 60, True, True).grid(row=i, column=0,padx=0, pady=3)
-            createEntry(frame, "--", 10, False, True).grid(row=i, column=1, padx=0, pady=3)
+            createEntry(frame, str(i+1), 60, True, True).grid(row=i, column=0,padx=0, pady=1)
+            createEntry(frame, "--", 10, False, True).grid(row=i, column=1, padx=0, pady=1)
         else:
-            createEntry(frame, str(i+1), 60, True, False).grid(row=i, column=0,padx=0, pady=3)
-            createEntry(frame, "--", 10, False, False).grid(row=i, column=1, padx=0, pady=3)
+            createEntry(frame, str(i+1), 60, True, False).grid(row=i, column=0,padx=0, pady=1)
+            createEntry(frame, "--", 10, False, False).grid(row=i, column=1, padx=0, pady=1)
 
 # startGame(): Void
 def startGame():
@@ -156,6 +156,18 @@ main.add(tab0, text="Welcome")
 main.add(tab1, text="Home")
 main.add(tab2, text="Away")
 main.add(tab3, text="Info and Start")
+
+# Create Canvas
+canvas1 = Canvas(tab1)
+canvas2 = Canvas(tab2)
+scroll1 = ttk.Scrollbar(tab1, command=canvas1.yview)
+scroll2 = ttk.Scrollbar(tab2, command=canvas2.yview)
+canvas1.config(yscrollcommand=scroll1.set, scrollregion=(0, 0, 100, 1000))
+canvas2.config(yscrollcommand=scroll2.set, scrollregion=(0, 0, 100, 1000))
+canvas1.pack(side=LEFT, fill=BOTH, expand=True)
+canvas2.pack(side=LEFT, fill=BOTH, expand=True)
+scroll1.pack(side=RIGHT, fill=Y)
+scroll2.pack(side=RIGHT, fill=Y)
 
 #add a label to the info tab for the date
 date = ttk.Label(tab3, text="Date")
