@@ -9,6 +9,8 @@ from court import drawCourt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.patches import Circle
 from statInstance import Stat
+from Heatmap import findLine, checkPointInSector, calculateZones, draw_court_vertical_heatmap
+from ShotChart import draw_court_vertical, map_shots
 import pandas as pd
 import os
 from datetime import date
@@ -93,19 +95,19 @@ def newWindow(game):
         
         previousStats.append({"type": type, "player": player, "contested": isContested, "missed": isMissed })
         if type == "twos" or type == "threes":
-            bottomLabel.configure(text="PlAYER: "+player+"     TEAM: "+team+"      SHOT TYPE: "+type[0: len(type)-1].upper()+("       MISSED" if isMissed else "      MADE")+" "+("     CONTESTED" if isContested else "     NOT CONTESTED"))
+            bottomLabel.configure(text="PlAYER: "+player+"     TEAM: "+team+"      SHOT TYPE: "+type[0: len(type)-1].upper()+("       MISSED" if isMissed else "      MADE")+" "+("     CONTESTED" if isContested else "     NOT CONTESTED"), foreground="black")
         elif type=="free throw":
-            bottomLabel.configure(text="PlAYER: "+player+"     TEAM: "+team+"      TYPE: FREE THROW"+("       MISSED" if isMissed else "      MADE"))
+            bottomLabel.configure(text="PlAYER: "+player+"     TEAM: "+team+"      TYPE: FREE THROW"+("       MISSED" if isMissed else "      MADE"), foreground="black")
         elif type=="offensive" or type=="defensive":
-            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: "+type.upper()+" REBOUND")
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: "+type.upper()+" REBOUND", foreground="black")
         elif type=="steals":
-            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: STEAL")
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: STEAL", foreground="black")
         elif type=="blocks":
-            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: BLOCK")
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: BLOCK", foreground="black")
         elif type=="fouls":
-            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: FOUL")
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: FOUL", foreground="black")
         else:
-            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: "+type.upper())
+            bottomLabel.configure(text="PLAYER: "+player+"     TEAM: "+team+"      CATEGORY: "+type.upper(), foreground="black")
 
     # toggleSub(index: int, home: boolean): Void
     def toggleSub(index, home):
@@ -152,16 +154,15 @@ def newWindow(game):
 
     # addShot(type: String): Void
     def addShot(type):
+        if type == "free throw":
+            return
         global x
         global y
         #print(x, y)
-        if not x == None and not y == None and (x<0) and curTeam.name == game.homeTeam.name:
+        if not x == None and not y == None and (x<0):
             x = -x
             y = -y
-        elif not x == None and not y == None and (x>=0) and curTeam.name == game.awayTeam.name:
-            x = -x
-            y = -y
-        shot = Shot(type, curPlayer.name,missed.missed, contested.contested, x, y).asDict()
+        shot = Shot(type, curPlayer.name, curPlayer.team, missed.missed, contested.contested, x, y).asDict()
         #print(shot.player.name, shot.type, shot.missed.missed, shot.contested.contested, shot.x, shot.y)
         shots.append(shot)
 
@@ -229,12 +230,18 @@ def newWindow(game):
             updateStats(Stat(curPlayer, curTeam, "rebound").setRebound(pos))
             setPrev(pos, curPlayer.number, curTeam.name, False, False)
             curPlayer.rebounds[pos] += 1
-            curTeam.rebounds[pos] =+ 1
+            curTeam.rebounds[pos] += 1
             reset()
     
     # addShot2or3(points: String): Void
     def addShot2or3(points):
-        if curPlayer != None and curTeam != None:
+        global x
+        global y
+        if x == None and y == None:
+            # Throw Error
+            bottomLabel.configure(text="ERROR: PLEASE CHOOSE A SHOT LOCATION FIRST!", foreground="red")
+            reset()
+        elif curPlayer != None and curTeam != None:
             addShot(points)
             setPrev(points, curPlayer.number, curTeam.name, contested.contested, missed.missed)
             instance = Stat(curPlayer, curTeam, points)
@@ -267,37 +274,249 @@ def newWindow(game):
         createBoxScore(boxFrame, True)
         createBoxScore(boxFrame, False)
         
+    def createShotChart(df, team, folder):
+        file_path1 = (folder + f"{team}/Shot_Charts/")
+        file_path2 = (folder + f"{team}/Heat_Maps/")
+        check_folder1 = os.path.isdir(file_path1)
+        check_folder2 = os.path.isdir(file_path2)
+        if not check_folder1:
+            os.makedirs(file_path1)
+        if not check_folder2:
+            os.makedirs(file_path2)
+            
+        map_shots(df, team, file_path1)
+        draw_court_vertical_heatmap(df, team, file_path2)
+        
+        if team == game.homeTeam.name:
+            if (game.homeTeam.shots["made"] + game.homeTeam.shots["missed"]["twos"] + game.homeTeam.shots["missed"]["threes"] == 0):
+                return
+            for player in game.playersHome:
+                df_player = df[df.player == player.name]
+                if df_player.size > 0:
+                    map_shots(df_player, player.name, file_path1)
+                    if df_player.size >= 5:
+                        draw_court_vertical_heatmap(df_player, player.name, file_path2)
+                
+        elif team == game.awayTeam.name:
+            if (game.awayTeam.shots["made"] + game.awayTeam.shots["missed"]["twos"] + game.awayTeam.shots["missed"]["threes"] == 0):
+                return
+            for player in game.playersAway:
+                df_player = df[df.player == player.name]
+                if df_player.size > 0:
+                    map_shots(df_player, player.name, file_path1)
+                    if df_player.size >= 5:
+                        draw_court_vertical_heatmap(df_player, player.name, file_path2)
+        
     def saveAsCSV():
         today = date.today()
         today = today.strftime("%b-%d-%Y")
         dfShots = pd.DataFrame(shots)
+        if(dfShots.size == 0):
+            home_dfShots = pd.DataFrame()
+            away_dfShots = pd.DataFrame()
+        else:
+            home_dfShots = dfShots[dfShots.team == game.homeTeam.name]
+            away_dfShots = dfShots[dfShots.team == game.awayTeam.name]
+            
         home_team_underscore = game.homeTeam.name.replace(" ", "_")
         away_team_underscore = game.awayTeam.name.replace(" ", "_")
+        tableauData = []
         
         homeTeamData = []
         for i in game.playersHome:
-            homeTeamData.append(i.__dict__)
+            FGM = i.__dict__['shots']['made']
+            FGA = FGM + i.__dict__['shots']['missed']['twos'] + i.__dict__['shots']['missed']['threes']
+            TwoPM = i.__dict__['shots']['twos']
+            ThreePM = i.__dict__['shots']['threes']
+            ThreePA = ThreePM + i.__dict__['shots']['missed']['threes']
+            FTM = i.__dict__['freethrows']['made']
+            FTA = FTM + i.__dict__['freethrows']['missed']
+            if FGA == 0:
+                FGPercent = 0
+                eFG = 0
+            else:
+                FGPercent = round((FGM / FGA)*100, 1)
+                eFG = round(100 * (FGM + (0.5 * ThreePM)) / FGA, 1)
+                if eFG > 100:
+                    eFG = 100
+            
+            if ThreePA == 0:
+                ThreePercent = 0
+            else:
+                ThreePercent = round((ThreePM / ThreePA)*100, 1)
+            
+            if FTA == 0:
+                FTPercent = 0
+            else:
+                FTPercent = round((FTM / FTA)*100, 1)
+            PTS = (2 * TwoPM) + (3 * ThreePM) + FTM
+            TOVPercent_denom = FGA + (0.44 * FTA) + i.__dict__['turnovers']
+            if TOVPercent_denom == 0:
+                TOVPercent = 0
+            else:
+                TOVPercent = round(100 * (i.__dict__['turnovers'] / TOVPercent_denom), 1)
+            new_dict = {'Player': i.__dict__['name'], 'Number': i.__dict__['number'], 'FGM': FGM, 'FGA': FGA, 'FG%': FGPercent, '3PM': ThreePM, '3PA': ThreePA, '3P%': ThreePercent, 'eFG%': eFG,
+                        'FTM': FTM, 'FTA': FTA, 'FT%': FTPercent, 'OREB': i.__dict__['rebounds']['offensive'], 'DREB': i.__dict__['rebounds']['defensive'], 'REB': i.__dict__['rebounds']['offensive'] + i.__dict__['rebounds']['defensive'],
+                        'AST': i.__dict__['assists'], 'STL': i.__dict__['steals'], 'BLK': i.__dict__['blocks'], 'TO': i.__dict__['turnovers'], 'TO%': TOVPercent, 'FOULS': i.__dict__['fouls'], 'PTS': PTS}
+            homeTeamData.append(new_dict)
         
-        homeTeamData.append(game.homeTeam.__dict__)
+        home_FGM = game.homeTeam.__dict__['shots']['made']
+        home_FGA = home_FGM + game.homeTeam.__dict__['shots']['missed']['twos'] + game.homeTeam.__dict__['shots']['missed']['threes']
+        home_TwoPM = game.homeTeam.__dict__['shots']['twos']
+        home_ThreePM = game.homeTeam.__dict__['shots']['threes']
+        home_ThreePA = home_ThreePM + game.homeTeam.__dict__['shots']['missed']['threes']
+        home_FTM = game.homeTeam.__dict__['freethrows']['made']
+        home_FTA = home_FTM + game.homeTeam.__dict__['freethrows']['missed']
+        if home_FGA == 0:
+            home_FGPercent = 0
+            home_eFG = 0
+        else:
+            home_FGPercent = round((home_FGM / home_FGA)*100, 1)
+            home_eFG = round(100 * (home_FGM + (0.5 * home_ThreePM)) / home_FGA, 1)
+            if home_eFG > 100:
+                home_eFG = 100
+        
+        if home_ThreePA == 0:
+            home_ThreePercent = 0
+        else:
+            home_ThreePercent = round((home_ThreePM / home_ThreePA)*100, 1)
+        
+        if home_FTA == 0:
+            home_FTPercent = 0
+        else:
+            home_FTPercent = round((home_FTM / home_FTA)*100, 1)
+        home_OReb_denom = game.homeTeam.__dict__['rebounds']['offensive'] + game.awayTeam.__dict__['rebounds']['defensive']
+        home_DReb_denom = game.homeTeam.__dict__['rebounds']['defensive'] + game.awayTeam.__dict__['rebounds']['offensive']
+        if home_OReb_denom == 0:
+            home_ORebPercent = 0
+        else:
+            home_ORebPercent = round(100 * (game.homeTeam.__dict__['rebounds']['offensive'] / home_OReb_denom), 1)
+        if home_DReb_denom == 0:
+            home_DRebPercent = 0
+        else:
+            home_DRebPercent = round(100 * (game.homeTeam.__dict__['rebounds']['defensive'] / home_DReb_denom), 1)
+        home_TOV_denom = home_FGA + (0.44 * home_FTA) + game.homeTeam.__dict__['turnovers']
+        if home_TOV_denom == 0:
+            home_TOVPercent = 0
+        else:
+            home_TOVPercent = round(100 * (game.homeTeam.__dict__['turnovers'] / home_TOV_denom), 1)
+        home_team_dict = {'Player': game.homeTeam.name, 'Number': None, 'FGM': home_FGM, 'FGA': home_FGA, 'FG%': home_FGPercent, '3PM': home_ThreePM, '3PA': home_ThreePA, '3P%': home_ThreePercent, 'eFG%': home_eFG,
+                        'FTM': home_FTM, 'FTA': home_FTA, 'FT%': home_FTPercent, 'OREB': game.homeTeam.__dict__['rebounds']['offensive'], 'DREB': game.homeTeam.__dict__['rebounds']['defensive'],
+                        'REB': game.homeTeam.__dict__['rebounds']['offensive'] + game.homeTeam.__dict__['rebounds']['defensive'],
+                        'AST': game.homeTeam.__dict__['assists'], 'STL': game.homeTeam.__dict__['steals'], 'BLK': game.homeTeam.__dict__['blocks'], 'TO': game.homeTeam.__dict__['turnovers'], 'TO%': home_TOVPercent, 'FOULS': game.homeTeam.__dict__['fouls'],
+                        'PTS': (2 * home_TwoPM) + (3 * home_ThreePM) + home_FTM}
+        tableau_home_team_dict = {'Team': game.homeTeam.name, 'PTS': (2 * home_TwoPM) + (3 * home_ThreePM) + home_FTM, 'AST': game.homeTeam.__dict__['assists'], 'FG%': home_FGPercent, '3P%': home_ThreePercent, 'FT%': home_FTPercent,
+                                  'eFG%': home_eFG, 'DREB%': home_DRebPercent, 'OREB%': home_ORebPercent, 'TOV%': home_TOVPercent, 'FOULS': game.homeTeam.__dict__['fouls']}
+        homeTeamData.append(home_team_dict)
+        tableauData.append(tableau_home_team_dict)
 
         awayTeamData = []
         for i in game.playersAway:
-            awayTeamData.append(i.__dict__)
+            FGM = i.__dict__['shots']['made']
+            FGA = FGM + i.__dict__['shots']['missed']['twos'] + i.__dict__['shots']['missed']['threes']
+            TwoPM = i.__dict__['shots']['twos']
+            ThreePM = i.__dict__['shots']['threes']
+            ThreePA = ThreePM + i.__dict__['shots']['missed']['threes']
+            FTM = i.__dict__['freethrows']['made']
+            FTA = FTM + i.__dict__['freethrows']['missed']
+            if FGA == 0:
+                FGPercent = 0
+                eFG = 0
+            else:
+                FGPercent = round((FGM / FGA)*100, 1)
+                eFG = round(100 * (FGM + (0.5 * ThreePM)) / FGA, 1)
+                if eFG > 100:
+                    eFG = 100
+            
+            if ThreePA == 0:
+                ThreePercent = 0
+            else:
+                ThreePercent = round((ThreePM / ThreePA)*100, 1)
+            
+            if FTA == 0:
+                FTPercent = 0
+            else:
+                FTPercent = round((FTM / FTA)*100, 1)
+            PTS = (2 * TwoPM) + (3 * ThreePM) + FTM
+            TOVPercent_denom = FGA + (0.44 * FTA) + i.__dict__['turnovers']
+            if TOVPercent_denom == 0:
+                TOVPercent = 0
+            else:
+                TOVPercent = round(100 * (i.__dict__['turnovers'] / TOVPercent_denom), 1)
+            new_dict = {'Player': i.__dict__['name'], 'Number': i.__dict__['number'], 'FGM': FGM, 'FGA': FGA, 'FG%': FGPercent, '3PM': ThreePM, '3PA': ThreePA, '3P%': ThreePercent, 'eFG%': eFG,
+                        'FTM': FTM, 'FTA': FTA, 'FT%': FTPercent, 'OREB': i.__dict__['rebounds']['offensive'], 'DREB': i.__dict__['rebounds']['defensive'], 'REB': i.__dict__['rebounds']['offensive'] + i.__dict__['rebounds']['defensive'],
+                        'AST': i.__dict__['assists'], 'STL': i.__dict__['steals'], 'BLK': i.__dict__['blocks'], 'TO': i.__dict__['turnovers'], 'TO%': TOVPercent, 'FOULS': i.__dict__['fouls'], 'PTS': PTS}
+            awayTeamData.append(new_dict)
         
-        awayTeamData.append(game.awayTeam.__dict__)
+        away_FGM = game.awayTeam.__dict__['shots']['made']
+        away_FGA = away_FGM + game.awayTeam.__dict__['shots']['missed']['twos'] + game.awayTeam.__dict__['shots']['missed']['threes']
+        away_TwoPM = game.awayTeam.__dict__['shots']['twos']
+        away_ThreePM = game.awayTeam.__dict__['shots']['threes']
+        away_ThreePA = away_ThreePM + game.awayTeam.__dict__['shots']['missed']['threes']
+        away_FTM = game.awayTeam.__dict__['freethrows']['made']
+        away_FTA = away_FTM + game.awayTeam.__dict__['freethrows']['missed']
+        if away_FGA == 0:
+            away_FGPercent = 0
+            away_eFG = 0
+        else:
+            away_FGPercent = round((away_FGM / away_FGA)*100, 1)
+            away_eFG = round(100 * (away_FGM + (0.5 * away_ThreePM)) / away_FGA, 1)
+            if away_eFG > 100:
+                away_eFG = 100
+        
+        if away_ThreePA == 0:
+            away_ThreePercent = 0
+        else:
+            away_ThreePercent = round((away_ThreePM / away_ThreePA)*100, 1)
+        
+        if away_FTA == 0:
+            away_FTPercent = 0
+        else:
+            away_FTPercent = round((away_FTM / away_FTA)*100, 1)
+        away_OReb_denom = game.awayTeam.__dict__['rebounds']['offensive'] + game.homeTeam.__dict__['rebounds']['defensive']
+        away_DReb_denom = game.awayTeam.__dict__['rebounds']['defensive'] + game.homeTeam.__dict__['rebounds']['offensive']
+        if away_OReb_denom == 0:
+            away_ORebPercent = 0
+        else:
+            away_ORebPercent = round(100 * (game.awayTeam.__dict__['rebounds']['offensive'] / away_OReb_denom), 1)
+        if away_DReb_denom == 0:
+            away_DRebPercent = 0
+        else:
+            away_DRebPercent = round(100 * (game.awayTeam.__dict__['rebounds']['defensive'] / away_DReb_denom), 1)
+        away_TOV_denom = away_FGA + (0.44 * away_FTA) + game.awayTeam.__dict__['turnovers']
+        if away_TOV_denom == 0:
+            away_TOVPercent = 0
+        else:
+            away_TOVPercent = round(100 * (game.awayTeam.__dict__['turnovers'] / away_TOV_denom), 1)
+        away_team_dict = {'Player': game.awayTeam.name, 'Number': None, 'FGM': away_FGM, 'FGA': away_FGA, 'FG%': away_FGPercent, '3PM': away_ThreePM, '3PA': away_ThreePA, '3P%': away_ThreePercent, 'eFG%': away_eFG,
+                        'FTM': away_FTM, 'FTA': away_FTA, 'FT%': away_FTPercent, 'OREB': game.awayTeam.__dict__['rebounds']['offensive'], 'DREB': game.awayTeam.__dict__['rebounds']['defensive'],
+                        'REB': game.awayTeam.__dict__['rebounds']['offensive'] + game.awayTeam.__dict__['rebounds']['defensive'],
+                        'AST': game.awayTeam.__dict__['assists'], 'STL': game.awayTeam.__dict__['steals'], 'BLK': game.awayTeam.__dict__['blocks'], 'TO': game.awayTeam.__dict__['turnovers'], 'TO%': away_TOVPercent, 'FOULS': game.awayTeam.__dict__['fouls'],
+                        'PTS': (2 * away_TwoPM) + (3 * away_ThreePM) + away_FTM}
+        tableau_away_team_dict = {'Team': game.awayTeam.name, 'PTS': (2 * away_TwoPM) + (3 * away_ThreePM) + away_FTM, 'AST': game.awayTeam.__dict__['assists'], 'FG%': away_FGPercent, '3P%': away_ThreePercent, 'FT%': away_FTPercent,
+                                  'eFG%': away_eFG, 'DREB%': away_DRebPercent, 'OREB%': away_ORebPercent, 'TOV%': away_TOVPercent, 'FOULS': game.awayTeam.__dict__['fouls']}
+        awayTeamData.append(away_team_dict)
+        tableauData.append(tableau_away_team_dict)
+        
 
         file_path = (f"output/{home_team_underscore}_vs_{away_team_underscore}{today}/")
         check_folder = os.path.isdir(file_path)
         if not check_folder:
             os.makedirs(file_path)
+            
+        createShotChart(home_dfShots, game.homeTeam.name, file_path)
+        createShotChart(away_dfShots, game.awayTeam.name, file_path)
         
-        dfShots.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{home_team_underscore}_vs_{away_team_underscore}{today}_shots.csv')
+        home_dfShots.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{home_team_underscore}_shots.csv')
+        away_dfShots.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{away_team_underscore}_shots.csv')
 
         dfHomeTeam = pd.DataFrame(homeTeamData)
         dfAwayTeam = pd.DataFrame(awayTeamData)
+        dfTableauData = pd.DataFrame(tableauData)
 
         dfHomeTeam.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{home_team_underscore}_stats.csv')
         dfAwayTeam.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/{away_team_underscore}_stats.csv')
+        dfTableauData.to_csv(f'output/{home_team_underscore}_vs_{away_team_underscore}{today}/tableau_data.csv')
 
 
     def createBoxScore(box, team):
@@ -307,7 +526,7 @@ def newWindow(game):
             columns = 0
         else:
             p = game.playersAway
-            t= game.awayTeam
+            t = game.awayTeam
             space = ttk.Label(box, text="          ")
             space.grid(row=0, column=8)
             columns = 9
@@ -471,12 +690,12 @@ def newWindow(game):
             instance.team.assists -= 1
         elif instance.type == "twos" or instance.type == "threes":
             del shots[-1]
-            instance.player.shots[instance.type] -= 1
-            instance.team.shots[instance.type] -= 1
             if instance.missed:
                 instance.player.shots["missed"][instance.type] -= 1
                 instance.team.shots["missed"][instance.type] -= 1
             else:
+                instance.player.shots[instance.type] -= 1
+                instance.team.shots[instance.type] -= 1
                 instance.player.shots["made"] -= 1
                 instance.team.shots["made"] -= 1
             if instance.contested:
@@ -766,17 +985,3 @@ def newWindow(game):
 
     # run loop
     master.mainloop()
-
-
-    
-
-
-
-
-
-
-
-    
-
-            
-    

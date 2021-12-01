@@ -26,8 +26,9 @@ class Team():
         
 
 class Shot():
-    def __init__(self, type, player, missed, contested, x ,y):
+    def __init__(self, type, player, team, missed, contested, x ,y):
         self.player = player
+        self.team = team
         self.missed = missed
         self.contested = contested
         self.type = type
@@ -35,7 +36,7 @@ class Shot():
         self.y = y
     
     def asDict(self):
-        return {"player": self.player, "missed": self.missed, "contested": self.contested, "type": self.type, "x": self.x, "y": self.y}
+        return {"player": self.player, "team": self.team, "missed": self.missed, "contested": self.contested, "type": self.type, "x": self.x, "y": self.y}
         
 
 
