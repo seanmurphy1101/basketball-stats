@@ -231,7 +231,7 @@ def calculateZones(df):
 
 def draw_court_vertical_heatmap(df, name, file_path, color="black", lw=2, zorder=1):
     global fig, ax
-    img = Image.open("basketball_court_background.jpg")
+    img = Image.open("images/basketball_court_background.jpg")
     img = img.rotate(90, expand=True)
     
     fig=plt.figure(figsize=(12.0,10.0))
