@@ -162,7 +162,7 @@ def newWindow(game):
         if not x == None and not y == None and (x<0):
             x = -x
             y = -y
-        shot = Shot(type, curPlayer.name, curPlayer.team, missed.missed, contested.contested, x, y).asDict()
+        shot = Shot(type, curPlayer.name, curPlayer.team, missed.missed, contested.contested, 0, 0).asDict()
         #print(shot.player.name, shot.type, shot.missed.missed, shot.contested.contested, shot.x, shot.y)
         shots.append(shot)
 
@@ -237,34 +237,36 @@ def newWindow(game):
     def addShot2or3(points):
         global x
         global y
-        if x == None and y == None:
-            # Throw Error
-            bottomLabel.configure(text="ERROR: PLEASE CHOOSE A SHOT LOCATION FIRST!", foreground="red")
-            reset()
-        elif curPlayer != None and curTeam != None:
-            addShot(points)
-            setPrev(points, curPlayer.number, curTeam.name, contested.contested, missed.missed)
-            instance = Stat(curPlayer, curTeam, points)
-            if not missed.missed:
-                curPlayer.shots[points] += 1
-                curTeam.shots[points] += 1
-            if missed.missed:
-                curPlayer.shots["missed"][points] +=1
-                curTeam.shots["missed"][points] +=1
-                instance.setMissed()
-            else:
-                curPlayer.shots["made"] += 1
-                curTeam.shots["made"] += 1
-            if contested.contested:
-                curPlayer.shots["contested"] += 1
-                curTeam.shots["contested"] += 1
-                instance.setContested()
-            else:
-                curPlayer.shots["uncontested"] += 1
-                curTeam.shots["uncontested"] += 1
+        x = 0
+        y = 0
+#         if x == None and y == None:
+#             # Throw Error
+#             bottomLabel.configure(text="ERROR: PLEASE CHOOSE A SHOT LOCATION FIRST!", foreground="red")
+#             reset()
+#         elif curPlayer != None and curTeam != None:
+        addShot(points)
+        setPrev(points, curPlayer.number, curTeam.name, contested.contested, missed.missed)
+        instance = Stat(curPlayer, curTeam, points)
+        if not missed.missed:
+            curPlayer.shots[points] += 1
+            curTeam.shots[points] += 1
+        if missed.missed:
+            curPlayer.shots["missed"][points] +=1
+            curTeam.shots["missed"][points] +=1
+            instance.setMissed()
+        else:
+            curPlayer.shots["made"] += 1
+            curTeam.shots["made"] += 1
+        if contested.contested:
+            curPlayer.shots["contested"] += 1
+            curTeam.shots["contested"] += 1
+            instance.setContested()
+        else:
+            curPlayer.shots["uncontested"] += 1
+            curTeam.shots["uncontested"] += 1
             
-            updateStats(instance)
-            reset()
+        updateStats(instance)
+        reset()
 
     def showBoxScore():
         box = Toplevel()
